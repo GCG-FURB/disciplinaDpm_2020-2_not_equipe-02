@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Dimensions, Button } from 'react-native';
+import { StyleSheet, View, TextInput, Dimensions, Button, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-
-import customStyle from './customStyle';
 
 export default function App() {
 
@@ -51,12 +49,21 @@ export default function App() {
   return (
     <View style={styles.container}>
       <MapView
-        customMapStyle={customStyle}
         style={styles.mapStyle}
         region={region}
         mapType={mapType}
         showsUserLocation={true}
      />
+    <Text>Latitude</Text>
+    <TextInput
+      style={styles.inputStyle}
+      value={region.latitude.toString()}
+    />
+    <Text>Longitude</Text>
+    <TextInput
+      style={styles.inputStyle}
+      value={region.longitude.toString()}
+    />
     <Button
       onPress={onPressChangeLayoutMap}
       title="Trocar mapa"
@@ -75,6 +82,15 @@ const styles = StyleSheet.create({
   },
   mapStyle: {
     width: Dimensions.get('window').width,
-    height: '90%'
+    height: '70%'
+  },
+  inputStyle: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    width: 200
+  },
+  buttonStyle: {
+    marginTop: 20
   }
 });
