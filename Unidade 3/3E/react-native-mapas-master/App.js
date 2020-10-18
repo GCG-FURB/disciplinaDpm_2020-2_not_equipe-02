@@ -8,16 +8,29 @@ export default function App() {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [region, setRegion] = useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
+    latitude: 0,
+    longitude: 0,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.04
   });
   const [mapType, setMapType] = useState("standard");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
 
   const onPressChangeLayoutMap = () => {
     setMapType(mapType=="standard" ? "satellite": "standard");
   };
+  const onDragEnd = (location) => {
+    setRegion({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0.001,
+      longitudeDelta: 0.001
+    });
+
+    setLatitude(location.latitude.toString());
+    setLongitude(location.longitude.toString());
+  }
 
   useEffect(() => {
     (async () => {
@@ -28,6 +41,7 @@ export default function App() {
 
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
+
       setRegion({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -35,6 +49,8 @@ export default function App() {
         longitudeDelta: 0.001
       });
 
+      setLatitude(location.coords.latitude.toString());
+      setLongitude(location.coords.longitude.toString());
     })();
   }, []);
 
@@ -53,16 +69,23 @@ export default function App() {
         region={region}
         mapType={mapType}
         showsUserLocation={true}
-     />
+      >
+        <Marker draggable
+        coordinate={region}
+        onDragEnd={(e) => onDragEnd(e.nativeEvent.coordinate)}
+        />
+    </MapView>
     <Text>Latitude</Text>
     <TextInput
       style={styles.inputStyle}
-      value={region.latitude.toString()}
+      onChangeText={(text) => onDragEnd(text)}
+      value={latitude}
     />
     <Text>Longitude</Text>
     <TextInput
       style={styles.inputStyle}
-      value={region.longitude.toString()}
+      onChangeText={(text) => setLongitude(text)}
+      value={longitude}
     />
     <Button
       onPress={onPressChangeLayoutMap}
