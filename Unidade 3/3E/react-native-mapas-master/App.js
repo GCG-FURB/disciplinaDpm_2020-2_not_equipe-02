@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, Dimensions, Button } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 
@@ -15,6 +15,11 @@ export default function App() {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.04
   });
+  const [mapType, setMapType] = useState("standard");
+
+  const onPressChangeLayoutMap = () => {
+    setMapType(mapType=="standard" ? "satellite": "standard");
+  };
 
   useEffect(() => {
     (async () => {
@@ -49,15 +54,14 @@ export default function App() {
         customMapStyle={customStyle}
         style={styles.mapStyle}
         region={region}
+        mapType={mapType}
+        showsUserLocation={true}
      />
-      <Marker
-          coordinate={region}
-          title="Local de Entrega"
-          description="Ruas das Palmeiras, 25"
-          icon={{
-            uri: "https://img.icons8.com/plasticine/1x/truck.png"
-          }}
-        />
+    <Button
+      onPress={onPressChangeLayoutMap}
+      title="Trocar mapa"
+      style={styles.buttonStyle}
+    />
     </View>
   );
 }
@@ -71,6 +75,6 @@ const styles = StyleSheet.create({
   },
   mapStyle: {
     width: Dimensions.get('window').width,
-    height: '100%'
+    height: '90%'
   }
 });
