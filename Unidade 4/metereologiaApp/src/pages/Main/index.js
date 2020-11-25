@@ -4,46 +4,49 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Container, Title, Form, Input, Submit, List} from './styles';
 import api from '~/services/api';
 import getRealm from '~/services/realm';
-import Repository from '~/components/Repository';
+import Weather from '~/components/Weather';
 
 export default function Main() {
   const [input, setInput] = useState('');
   const [error, setError] = useState(false);
-  const [repositories, setRepositories] = useState([]);
+  const [weathers, setWeathers] = useState([]);
 
   useEffect(() => {
-    async function loadRepositories() {
+    async function loadWeathers() {
       const realm = await getRealm();
-      const data = realm.objects('Repository').sorted('stars', true);
-      setRepositories(data);
+      const data = realm.objects('Weather');
+      setWeathers(data);
     }
 
-    loadRepositories();
+    console.log(weathers);
+
+    loadWeathers();
   }, []);
 
-  async function saveRepository(repository) {
+  async function saveForecast(params) {
     const data = {
-      id: repository.id,
-      name: repository.name,
-      fullName: repository.full_name,
-      description: String(repository.description),
-      stars: repository.stargazers_count,
-      forks: repository.forks_count,
+      id: params.id,
+      name: params.name,
+      temp: params.main.temp,
     };
+
+    console.log(data);
 
     const realm = await getRealm();
     realm.write(() => {
-      realm.create('Repository', data, 'modified');
+      realm.create('Weather', data, 'modified');
     });
 
     return data;
   }
 
-  async function handleAddRepository() {
-    try {
-      const response = await api.get(`/repos/${input}`);
 
-      await saveRepository(response.data);
+  async function handleCityWeatherForecast() {
+    try {
+      console.log(input);
+      const response = await api.get(`https://api.openweathermap.org/data/2.5/weather?q=${input}&appid=4d8fb5b93d4af21d66a2948710284366&units=metric`);
+
+      await saveForecast(response.data);
       setInput('');
       setError(false);
       Keyboard.dismiss();
@@ -53,18 +56,20 @@ export default function Main() {
     }
   }
 
-  async function handleRefreshRepository(repository) {
-    const response = await api.get(`/repos/${repository.fullName}`);
-    const data = await saveRepository(response.data);
+  async function handlerRefreshWeatherForecast(weather) {
+    const response = await api.get(`https://api.openweathermap.org/data/2.5/weather?q=${weather.name}&appid=4d8fb5b93d4af21d66a2948710284366&units=metric`);
+    console.log(response);
+    const data = await saveForecast(response.data);
 
-    setRepositories(
-      repositories.map((repo) => (repo.id === data.id ? data : repo)),
+    setWeathers(
+      weathers.map((temp) => (temp.id === data.id ? data : temp)),
     );
+
   }
 
   return (
     <Container>
-      <Title>Repositórios</Title>
+      <Title>Weather App</Title>
       <Form>
         <Input
           value={input}
@@ -72,23 +77,25 @@ export default function Main() {
           onChangeText={setInput}
           autoCapitalize="none"
           autoCorrect={false}
-          placeholder="Procurar repositório..."
+          placeholder="Procurar cidades..."
         />
-        <Submit onPress={handleAddRepository}>
+        <Submit onPress={handleCityWeatherForecast}>
           <Icon name="add" size={22} color="#FFF"></Icon>
         </Submit>
       </Form>
+
       <List
         keyboardShouldPersistTaps="handled"
-        data={repositories}
+        data={weathers}
         keyExtractor={(item) => String(item.id)}
         renderItem={({item}) => (
-          <Repository
+          <Weather
             data={item}
-            onRefresh={() => handleRefreshRepository(item)}
+            onRefresh={() => handlerRefreshWeatherForecast(item)}
           />
         )}
-      />
+      /> 
+
     </Container>
   );
 }

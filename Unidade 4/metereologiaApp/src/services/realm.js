@@ -1,8 +1,8 @@
 import Realm from 'realm';
-import RepositorySchema from '../schemas/RepositorySchema';
+import WeatherSchema from '../schemas/WeatherSchema';
 
 export default function getRealm() {
   return Realm.open({
-    schema: [RepositorySchema],
+    schema: [WeatherSchema],
   });
 }

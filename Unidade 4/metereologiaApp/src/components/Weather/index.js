@@ -12,12 +12,12 @@ import {
 } from './styles';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-export default function Repository({data, onRefresh}) {
+export default function Weather({data, onRefresh}) {
   return (
     <Container>
       <Name>{data.name}</Name>
-      <Description>{data.description}</Description>
-      <Stats>
+      <Description>{data.temp}</Description>
+      {/* <Stats>
         <Stat>
           <Icon name="star" size={16} color="#333" />
           <StatCount>{data.stars}</StatCount>
@@ -26,7 +26,7 @@ export default function Repository({data, onRefresh}) {
           <Icon name="code-fork" size={16} color="#333" />
           <StatCount>{data.forks}</StatCount>
         </Stat>
-      </Stats>
+      </Stats> */}
       <Refresh onPress={onRefresh}>
         <Icon name="refresh" color="#7159c1" size={16} />
         <RefreshText>ATUALIZAR</RefreshText>
