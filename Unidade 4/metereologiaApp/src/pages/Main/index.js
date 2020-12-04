@@ -11,7 +11,6 @@ export default function Main() {
   const [input, setInput] = useState('');
   const [error, setError] = useState(false);
   const [weathers, setWeathers] = useState([]);
-  const [position, setPosition] = useState(null);
 
   useEffect(() => {
     async function loadWeathers() {
@@ -25,19 +24,15 @@ export default function Main() {
         );
 
         if (granted) {
-          console.log('You can use the ACCESS_FINE_LOCATION');
-
           Geolocation.getCurrentPosition(
             async (position) => {
-              console.log(position);
               const response = await fetch(
                 `https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.coords.latitude},${position.coords.longitude}&key=AIzaSyA8dThs16mRcmgEuorMMnp0CuH22VQNriw`,
               );
               const json = await response.json();
-              handlerRefreshWeatherForecast(json.results[0].address_components[3].long_name);
+              getWeather(json.results[0].address_components[3].long_name);
             },
             (error) => {
-              // See error code charts below.
               console.log(error.code, error.message);
             },
             {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
@@ -53,46 +48,26 @@ export default function Main() {
     loadWeathers();
   }, []);
 
-  async function getLocationUser() {
-    await Geolocation.getCurrentPosition(
-      (info) => {
-        setPosition({
-          longitude: info.coords.longitude,
-          latitude: info.coords.latitude,
-        });
-        console.log(position);
-      },
-      (error) => {
-        console.log(error);
-      },
-    );
-  }
-
   async function saveForecast(params) {
     const data = {
       id: params.id,
       name: params.name,
-      temp: params.main.temp,
+      temp: Math.round(params.main.temp),
+      icon: params.weather[0].icon,
     };
-
-    console.log(data);
 
     const realm = await getRealm();
     realm.write(() => {
       realm.create('Weather', data, 'modified');
     });
 
+    setWeathers(realm.objects('Weather'));
     return data;
   }
 
   async function handleCityWeatherForecast() {
     try {
-      console.log(input);
-      const response = await api.get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${input}&appid=4d8fb5b93d4af21d66a2948710284366&units=metric`,
-      );
-
-      await saveForecast(response.data);
+      getWeather(input);
       setInput('');
       setError(false);
       Keyboard.dismiss();
@@ -102,14 +77,18 @@ export default function Main() {
     }
   }
 
-  async function handlerRefreshWeatherForecast(name) {
-    const response = await api.get(
-      `https://api.openweathermap.org/data/2.5/weather?q=${name}&appid=4d8fb5b93d4af21d66a2948710284366&units=metric`,
-    );
-    console.log(response);
-    const data = await saveForecast(response.data);
+  async function handlerRefreshWeatherForecast(city_name) {
+    const data = getWeather(city_name);
 
     setWeathers(weathers.map((temp) => (temp.id === data.id ? data : temp)));
+  }
+
+  async function getWeather(city_name) {
+    const response = await api.get(
+      `https://api.openweathermap.org/data/2.5/weather?q=${city_name}&appid=4d8fb5b93d4af21d66a2948710284366&units=metric`,
+    );
+
+    return await saveForecast(response.data);
   }
 
   return (
