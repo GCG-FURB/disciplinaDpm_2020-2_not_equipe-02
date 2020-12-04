@@ -44,6 +44,6 @@ export const Refresh = styled.TouchableOpacity`
 export const RefreshText = styled.Text`
   font-size: 14px;
   font-weight: bold;
-  color: #7159c1;
+  color: #49c1ab;
   margin-left: 5px;
 `;

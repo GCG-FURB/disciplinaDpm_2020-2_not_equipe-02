@@ -3,7 +3,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import {getStatusBarHeight} from 'react-native-status-bar-height';
 
 export const Container = styled(LinearGradient).attrs({
-  colors: ['#7159c1', '#9B49c1'],
+  colors: ['#49c1ab', '#498fc1'],
   start: {x: 0, y: 0},
   end: {x: 1, y: 1},
 })`
@@ -37,7 +37,7 @@ export const Input = styled.TextInput.attrs({
 `;
 
 export const Submit = styled.TouchableOpacity`
-  background: #6bd4c1;
+  background: #498fc1;
   margin-left: 10px;
   justify-content: center;
   border-radius: 4px;
