@@ -17,8 +17,9 @@ export const Description = styled.Text.attrs({
 	numberOfLines: 2,
 })`
   color: #666;
-  margin-top: 5px;
-  line-height: 20px;
+  margin-top: 10px;
+  line-height: 40px;
+  font-size: 40px;
 `;
 
 export const Stats = styled.View`
