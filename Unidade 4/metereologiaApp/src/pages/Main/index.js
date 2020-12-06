@@ -107,7 +107,6 @@ export default function Main() {
           <Icon name="add" size={22} color="#FFF"></Icon>
         </Submit>
       </Form>
-
       <List
         keyboardShouldPersistTaps="handled"
         data={weathers}
